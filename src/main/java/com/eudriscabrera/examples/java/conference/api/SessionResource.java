@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 @Path("/sessions")
 public class SessionResource {
@@ -34,7 +35,7 @@ public class SessionResource {
     public Response findSession(@PathParam("id") String id) {
         logger.info("Getting Session by id {0}", id);
 
-        Session Session = sessionService.findById(id).orElseThrow(() -> new WebApplicationException(Response.Status.NO_CONTENT));
+        Session Session = sessionService.findById(id).orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
 
         return Response.ok(Session).build();
     }
@@ -42,12 +43,15 @@ public class SessionResource {
     @POST
     @Consumes("application/json")
     @Produces("application/json")
-    public Response create(Session Session) {
-        logger.info("Creating Session {0}", Session.getTitle());
+    public Response create(Session session) {
+        logger.info("Creating Session {0}", session.getTitle());
         try {
-            return Response.ok(sessionService.addSession(Session)).build();
+            Session sessionCreated = sessionService.addSession(session);
+            return Response.created(URI.create("/" + sessionCreated.getId()))
+                    .entity(sessionCreated)
+                    .build();
         } catch (PersistenceException ex) {
-            logger.info("Error creating Session {0}", Session.getTitle());
+            logger.info("Error creating Session {0}", session.getTitle());
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
     }
@@ -56,15 +60,15 @@ public class SessionResource {
     @Path("{id}")
     @Consumes("application/json")
     @Produces("application/json")
-    public Response update(@PathParam("id") Integer id, Session Session) {
+    public Response update(@PathParam("id") Integer id, Session session) {
 
-        logger.info("Updating Session {0}", Session.getTitle());
+        logger.info("Updating Session {0}", session.getTitle());
         try {
-            return Response.ok(sessionService.update(Session)).build();
+            return Response.ok(sessionService.update(session)).build();
 
         } catch (PersistenceException ex) {
 
-            logger.error("Error updating Session {0}", Session.getTitle());
+            logger.error("Error updating Session {0}", session.getTitle());
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
     }

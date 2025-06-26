@@ -24,11 +24,12 @@ public class SessionService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public Session addSession(Session Session) {
-        logger.info("Creating Session {0}", Session.getTitle());
-        entityManager.persist(Session);
+    public Session addSession(Session session) {
+        logger.info("Creating Session {0}", session.getTitle());
 
-        return Session;
+        entityManager.persist(session);
+
+        return session;
     }
 
     public List<Session> getAllSessions() {
@@ -43,10 +44,10 @@ public class SessionService {
         return Optional.ofNullable(entityManager.find(Session.class, id));
     }
 
-    public Session update(Session Session) {
-        logger.info("Updating Session {0}", Session.getTitle());
+    public Session update(Session session) {
+        logger.info("Updating Session {0}", session.getTitle());
 
-        return entityManager.merge(Session);
+        return entityManager.merge(session);
     }
 
     public void clear() {

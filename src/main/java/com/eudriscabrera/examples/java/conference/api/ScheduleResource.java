@@ -32,11 +32,12 @@ public class ScheduleResource {
 
     @POST
     @Consumes("application/json")
+    @Produces("application/json")
     public Response add(final Schedule schedule) {
         final Schedule created = scheduleService.addSchedule(schedule);
         return Response
                 .created(URI.create("/" + created.getId()))
-                .entity(transform(created))
+                .entity(created)
                 .build();
     }
 

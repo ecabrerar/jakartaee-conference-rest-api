@@ -60,7 +60,7 @@ class SpeakerResourceTest {
          when()
              .get("/speakers/{id}").
                 then().
-                statusCode(HttpStatus.SC_BAD_REQUEST);
+                statusCode(HttpStatus.SC_NOT_FOUND);
 
     }
 
