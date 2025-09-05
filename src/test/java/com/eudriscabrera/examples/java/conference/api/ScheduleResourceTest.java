@@ -4,7 +4,6 @@ package com.eudriscabrera.examples.java.conference.api;
 import com.eudriscabrera.examples.java.conference.entities.Schedule;
 import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
