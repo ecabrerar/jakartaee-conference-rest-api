@@ -60,11 +60,18 @@ public class SessionResource {
     @Path("{id}")
     @Consumes("application/json")
     @Produces("application/json")
-    public Response update(@PathParam("id") Integer id, Session session) {
+    public Response update(@PathParam("id") String id, Session session) {
 
         logger.info("Updating Session {0}", session.getTitle());
         try {
-            return Response.ok(sessionService.update(session)).build();
+
+          Session existingSession =  sessionService.findById(id).orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
+            existingSession.setTitle(session.getTitle());
+            existingSession.setDuration(session.getDuration());
+            existingSession.setFeatured(session.isFeatured());
+            existingSession.setSpeaker(session.getSpeaker());
+
+            return Response.ok(sessionService.update(existingSession)).build();
 
         } catch (PersistenceException ex) {
 

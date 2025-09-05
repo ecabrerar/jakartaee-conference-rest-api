@@ -1,18 +1,17 @@
 package com.eudriscabrera.examples.java.conference.api;
 
-import com.eudriscabrera.examples.java.conference.entities.Session;
-import com.eudriscabrera.examples.java.conference.entities.Speaker;
+
+import com.eudriscabrera.examples.java.conference.entities.Schedule;
 import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
-import static jakarta.servlet.http.HttpServletResponse.SC_OK;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ScheduleResourceTest extends BaseAPITest{
 
@@ -30,41 +29,21 @@ class ScheduleResourceTest extends BaseAPITest{
 
     @Test
     void addSchedule() {
+        var sessionCreated =  ConferenceDataFactory.oneExistingSession();
 
-        var newSpeaker = ConferenceFactory.createSpeaker();
+        var newSchedule  = ConferenceFactory.addSchedule(sessionCreated);
 
-        Speaker created = given().
-                contentType(ContentType.JSON).
-                body(newSpeaker).
-                when().
-                post("/speakers").
-                then().
-                statusCode(SC_CREATED)
-                .extract()
-                .as(Speaker.class);
-
-        var session = ConferenceFactory.createSession(created);
-
-        var sessionCreated =  given().
-                contentType(ContentType.JSON).
-                body(session).
-                when().
-                post("/sessions").
-                then().
-                statusCode(SC_CREATED)
-                .extract()
-                .as(Session.class);
-
-
-       var newSchedule  = ConferenceFactory.addSchedule(sessionCreated);
-
-        given().
+       var scheduleReturned = given().
                 contentType(ContentType.JSON).
                 body(newSchedule).
                 when().
                 post("/schedules").
                 then().
-                statusCode(SC_CREATED);
+                statusCode(SC_CREATED).
+                extract().
+                as(Schedule.class);
+
+        assertEquals(newSchedule.getRoom(), scheduleReturned.getRoom());
     }
 
     @Test

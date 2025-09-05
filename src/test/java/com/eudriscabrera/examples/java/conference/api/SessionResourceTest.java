@@ -5,13 +5,14 @@ import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static jakarta.servlet.http.HttpServletResponse.SC_CREATED;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
 
 class SessionResourceTest extends BaseAPITest{
 
@@ -46,17 +47,7 @@ class SessionResourceTest extends BaseAPITest{
     @Test
     void createSession() {
 
-        var newSpeaker = ConferenceFactory.createSpeaker();
-
-        Speaker created = given().
-                contentType(ContentType.JSON).
-                body(newSpeaker).
-                when().
-                post("/speakers").
-                then().
-                statusCode(SC_CREATED)
-                .extract()
-                .as(Speaker.class);
+        Speaker created = ConferenceDataFactory.oneExistingSpeaker();
 
         var session = ConferenceFactory.createSession(created);
 
@@ -66,13 +57,30 @@ class SessionResourceTest extends BaseAPITest{
                 when().
                 post("/sessions").
                 then().
-                statusCode(SC_OK)
-                .body("[0].id", equalTo(session.getId()));
+                statusCode(SC_CREATED)
+                .body("[0].id", equalTo(session.getId()),
+                        "title", equalTo(session.getTitle()));
 
 
     }
 
     @Test
-    void update() {
+    void updateSession() {
+
+        var session = ConferenceDataFactory.oneExistingSession();
+        session.setDuration(Duration.of(60, ChronoUnit.MINUTES));
+        session.setFeatured(true);
+
+        given().
+                contentType(ContentType.JSON).
+                pathParam("id", session.getId()).
+                body(session).
+                when()
+                .put("/sessions/{id}").
+                then().
+                statusCode(SC_OK)
+                .body("id", equalTo(session.getId()),
+                        "title", equalTo(session.getTitle()),
+                        "featured", is(session.isFeatured()));
     }
 }

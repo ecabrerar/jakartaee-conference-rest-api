@@ -24,11 +24,11 @@ public class SpeakerService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public Speaker addSpeaker(Speaker Speaker) {
-        logger.info("Creating Speaker {0}", Speaker.getName());
-        entityManager.persist(Speaker);
+    public Speaker addSpeaker(Speaker speaker) {
+        logger.info("Creating speaker {0}", speaker.getName());
+        entityManager.persist(speaker);
 
-        return Speaker;
+        return speaker;
     }
 
     public List<Speaker> getAllSpeakers() {

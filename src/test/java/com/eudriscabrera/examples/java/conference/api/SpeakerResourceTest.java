@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 class SpeakerResourceTest {
 
+
     @BeforeEach
     public void setup() {
         RestAssured.baseURI = "http://localhost";
@@ -35,8 +36,11 @@ class SpeakerResourceTest {
                 when().
                 post("/speakers").
                 then().
+                log().all().
                 statusCode(SC_CREATED)
-                .body("[0].id", equalTo(speaker.getId()));
+                .contentType(ContentType.JSON)
+                .body("[0].id", equalTo(speaker.getId()),
+                        "name",equalTo(speaker.getName()));
 
     }
 
@@ -67,17 +71,7 @@ class SpeakerResourceTest {
     @Test
     void getExistingSpeaker() {
 
-        var newSpeaker = ConferenceFactory.createSpeaker();
-
-        Speaker created = given().
-                contentType(ContentType.JSON).
-                body(newSpeaker).
-                when().
-                post("/speakers").
-                then().
-                statusCode(SC_CREATED)
-                .extract()
-                .as(Speaker.class);
+        Speaker created = ConferenceDataFactory.oneExistingSpeaker();
 
         given().
                 pathParam("id", created.getId()).
@@ -98,18 +92,7 @@ class SpeakerResourceTest {
 
     @Test
     void updateSpeaker() {
-        var newSpeaker = ConferenceFactory.createSpeaker();
-
-        Speaker created = given().
-                contentType(ContentType.JSON).
-                body(newSpeaker).
-                when().
-                post("/speakers").
-                then().
-                statusCode(SC_CREATED)
-                .extract()
-                .as(Speaker.class);
-
+        Speaker created = ConferenceDataFactory.oneExistingSpeaker();
 
         created.setCountry("Dominican Republic");
         created.setOrganization("Dominicana JUG");
